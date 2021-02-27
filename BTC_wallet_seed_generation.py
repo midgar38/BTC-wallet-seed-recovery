@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jun  5 22:12:24 2020
-
-@author: gaelgiusti
-"""
-
-
 from bitcoinlib.mnemonic import Mnemonic
 from bitcoinlib.encoding import to_hexstring
 import hmac, hashlib
@@ -26,7 +19,7 @@ import itertools as it
 import random
 
 f = open('english.txt', 'r+')
-#rajout de .strip() pourenlever le /n à la fin de chaque mot
+#rajout de .strip() pour enlever le /n à la fin de chaque mot
 lines = [line.strip() for line in f.readlines()]
 f.close()
 # print(lines)
@@ -36,7 +29,7 @@ f.close()
 
 count=0
 while True:
-    #Generate of the passphrases
+    #Generation of the passphrases
     my_dict={'A':['army'],'B':['excuse'],'C':['hero'], 
              'D':['wolf'], 'E':['disease'],
              'F':['liberty'], 'G':['moral'], 'H': ['diagram'], 'I': [random.choice(lines)], 'J': [random.choice(lines)],
@@ -55,7 +48,7 @@ while True:
         words.append(' '.join(test_list[i]))
         #words=' '.join(test_list[i])
         # m=to_hexstring(Mnemonic().to_seed(words))
-    #OK, ça marche
+
     # print(words)
     # print(words[1]) 
     
