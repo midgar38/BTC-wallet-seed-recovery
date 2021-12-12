@@ -18,6 +18,7 @@ import base58
 import itertools as it
 import random
 
+#Opening a text file
 f = open('english.txt', 'r+')
 #rajout de .strip() pour enlever le /n à la fin de chaque mot
 lines = [line.strip() for line in f.readlines()]
@@ -25,16 +26,15 @@ f.close()
 # print(lines)
 # print(lines[0])
 
-# print("mot chance est", random.choice(lines))
-
 count=0
 while True:
-    #Generation of the passphrases
+    #Generation of the 12-word passphrase with some words already known.
     my_dict={'A':['army'],'B':['excuse'],'C':['hero'], 
              'D':['wolf'], 'E':['disease'],
              'F':['liberty'], 'G':['moral'], 'H': ['diagram'], 'I': [random.choice(lines)], 'J': [random.choice(lines)],
              'K': [random.choice(lines)], 'L': [random.choice(lines)]}
     allNames = sorted(my_dict)
+    #All possible dictionnary combinations
     combinations = it.product(*(my_dict[Name] for Name in allNames))
     # print(list(combinations))
     
@@ -42,6 +42,7 @@ while True:
     # print("words1 is", words1)
     # print(to_hexstring(Mnemonic().to_seed(words1)))
     
+    #List of all the possible combinations
     test_list=[list(i) for i in list(combinations)] # list of lists
     words=[]   
     for i in range(0,len(test_list)):
@@ -56,18 +57,19 @@ while True:
     # my_str = "hello world"
     # my_str_as_bytes = str.encode(my_str)
     # print("my string is", my_str_as_bytes)
-    #convert list words into list of bytes
+    
+    #convert list of words into list of bytes
     words_bytes=[]
     words_bytes=[str.encode(word) for word in words]
-    
     # print(words_bytes)
     
+    #sha 512 on all list of words converted to bytes and results in hexadecimal.
     root_seed=[]
     for i in range(0,len(words)):
         root_seed.append(hashlib.pbkdf2_hmac('sha512', words_bytes[i], b'mnemonic', 2048).hex())
-       
     # print(root_seed)
     
+    #Conversion of the previous elements of root_seed to bytes.
     root_seed_bytes=[str.encode(seed) for seed in root_seed]
     
     root_private_key=[]
@@ -75,8 +77,7 @@ while True:
         root_private_key.append(hmac.new(root_seed_bytes[i], msg=None, digestmod=hashlib.sha512).hexdigest())
     
     # print(root_private_key)
-    
-    master_private_key=[] #first half of rot private key
+    master_private_key=[] #first half of root private key
     master_private_key2=[]
     for i in range(0,len(words)):
         master_private_key.append(root_private_key[i][0:len(root_private_key[i])//2])
@@ -89,7 +90,7 @@ while True:
     
     # print(public_key)
     
-    #conversion public key en string in hex
+    #Conversion of public key to string in hex
     public_key_string=[]
     public_key_string=[word.to_string().hex() for word in public_key]
     # print(public_key_string)
@@ -140,6 +141,7 @@ while True:
     # print(prepend_bytes)
     
     #double sha256
+    #First sha256
     double_sha256_1=[]
     for i in range(0,len(words)):
         double_sha256_1.append(hashlib.sha256(prepend_bytes[i]).hexdigest())
@@ -150,7 +152,7 @@ while True:
     double_sha256_1_bytes=[]
     double_sha256_1_bytes=[str.encode(pk) for pk in double_sha256_1]
     
-    
+    #Second sha256
     double_sha256_2=[]
     for i in range(0,len(words)):
         double_sha256_2.append(hashlib.sha256(double_sha256_1_bytes[i]).hexdigest())
@@ -174,34 +176,22 @@ while True:
         bitcoinAddress.append(base58.b58encode(binascii.unhexlify(appendchecksum[i])))
     # print("Les adresses BTC sont", bitcoinAddress)
     
-    #Pour passer de bytes à string
+    #Convert from bytes to strings
     bitcoinAddress_decode=[]
     bitcoinAddress_decode=[btc.decode("utf-8") for btc in bitcoinAddress]
     print("Les adresses BTC sont", bitcoinAddress_decode)
 
 
-#Compare the list to Alistair's address: 3HX5tttedDehKWTTGpxaPAbo157fnjn89s
+    #Compare the list to a given address that is known: 3HX5tttedDehKWTTGpxaPAbo157fnjn89s
     for address in bitcoinAddress_decode:
         if '3HX5tttedDehKWTTGpxaPAbo157fnjn89s' == address:
             print(bitcoinAddress_decode.index("3HX5tttedDehKWTTGpxaPAbo157fnjn89s"))
-            print("C'est gagné")
+            print("Decoded")
             break
         
     count=count+1
     print("The count is ", count)
         
-    # else:
-    #     print("C'est perdu")
-
-
-#while loop implementation, example
-
-# while True:
-#     n = raw_input("Please enter 'hello':")
-#     if n.strip() == 'hello':
-#         break
-
-
 
 
 ############################
